@@ -11,8 +11,8 @@
   DTS:LocaleID="13322"
   DTS:ObjectName="Package"
   DTS:PackageType="5"
-  DTS:VersionBuild="21"
-  DTS:VersionGUID="{6B447B72-2F03-4512-97AB-27808629E27A}">
+  DTS:VersionBuild="22"
+  DTS:VersionGUID="{ECC92C85-714F-4329-9700-553D68548008}">
   <DTS:Property
     DTS:Name="PackageFormatVersion">8</DTS:Property>
   <DTS:ConnectionManagers>
@@ -930,6 +930,24 @@ WHERE	FACULTAD_ID IS NOT NULL AND
                       cachedName="FECHA_COMIENZO"
                       externalMetadataColumnId="Package\Carga de la FACT\Destino FACT.Inputs[OLE DB Destination Input].ExternalColumns[TIEMPO_ID]"
                       lineageId="Package\Carga de la FACT\Origen FACT.Outputs[OLE DB Source Output].Columns[FECHA_COMIENZO]" />
+                    <inputColumn
+                      refId="Package\Carga de la FACT\Destino FACT.Inputs[OLE DB Destination Input].Columns[Cantidad_Personas]"
+                      cachedDataType="i4"
+                      cachedName="Cantidad_Personas"
+                      externalMetadataColumnId="Package\Carga de la FACT\Destino FACT.Inputs[OLE DB Destination Input].ExternalColumns[UNIDADES]"
+                      lineageId="Package\Carga de la FACT\Origen FACT.Outputs[OLE DB Source Output].Columns[Cantidad_Personas]" />
+                    <inputColumn
+                      refId="Package\Carga de la FACT\Destino FACT.Inputs[OLE DB Destination Input].Columns[Suma_Monto]"
+                      cachedDataType="cy"
+                      cachedName="Suma_Monto"
+                      externalMetadataColumnId="Package\Carga de la FACT\Destino FACT.Inputs[OLE DB Destination Input].ExternalColumns[SUMA]"
+                      lineageId="Package\Carga de la FACT\Origen FACT.Outputs[OLE DB Source Output].Columns[Suma_Monto]" />
+                    <inputColumn
+                      refId="Package\Carga de la FACT\Destino FACT.Inputs[OLE DB Destination Input].Columns[Promedio_Edad]"
+                      cachedDataType="i4"
+                      cachedName="Promedio_Edad"
+                      externalMetadataColumnId="Package\Carga de la FACT\Destino FACT.Inputs[OLE DB Destination Input].ExternalColumns[PROMEDIO]"
+                      lineageId="Package\Carga de la FACT\Origen FACT.Outputs[OLE DB Source Output].Columns[Promedio_Edad]" />
                   </inputColumns>
                   <externalMetadataColumns
                     isUsed="True">
@@ -961,6 +979,14 @@ WHERE	FACULTAD_ID IS NOT NULL AND
                       refId="Package\Carga de la FACT\Destino FACT.Inputs[OLE DB Destination Input].ExternalColumns[UNIDADES]"
                       dataType="i4"
                       name="UNIDADES" />
+                    <externalMetadataColumn
+                      refId="Package\Carga de la FACT\Destino FACT.Inputs[OLE DB Destination Input].ExternalColumns[SUMA]"
+                      dataType="i4"
+                      name="SUMA" />
+                    <externalMetadataColumn
+                      refId="Package\Carga de la FACT\Destino FACT.Inputs[OLE DB Destination Input].ExternalColumns[PROMEDIO]"
+                      dataType="i4"
+                      name="PROMEDIO" />
                   </externalMetadataColumns>
                 </input>
               </inputs>
@@ -1014,7 +1040,15 @@ WHERE	FACULTAD_ID IS NOT NULL AND
                   dataType="System.String"
                   description="The SQL command to be executed."
                   name="SqlCommand"
-                  UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor">SELECT		car.CARGO_ID, fac.FACULTAD_ID, loc.LOCALIDAD_ID, sa.SALARIO_ID, per.PERSONA_ID, FECHA_COMIENZO
+                  UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor">SELECT		car.CARGO_ID, 
+			fac.FACULTAD_ID, 
+			loc.LOCALIDAD_ID, 
+			sa.SALARIO_ID, 
+			per.PERSONA_ID, 
+			FECHA_COMIENZO, 
+			COUNT(per.PERSONA_ID) Cantidad_Personas, 
+			SUM(sa.SALARIO_MONTO) Suma_Monto, 
+			avg(CONVERT(int,CONVERT(char(8),GETDATE(),112))-CONVERT(char(8),PERSONA_FECHA_NACIMIENTO,112))/10000 Promedio_Edad
 FROM		CONTRATO con
 INNER JOIN	CARGO car
 ON		con.CARGO_ID = car.CARGO_ID
@@ -1041,7 +1075,8 @@ WHERE
 			FROM		PERSONA
 			GROUP BY	PERSONA_ID
 			HAVING		COUNT(PERSONA_ID) &gt; 1
-		)</property>
+		)
+GROUP BY car.CARGO_ID, fac.FACULTAD_ID, loc.LOCALIDAD_ID, sa.SALARIO_ID, per.PERSONA_ID, FECHA_COMIENZO</property>
                 <property
                   dataType="System.String"
                   description="The variable that contains the SQL command to be executed."
@@ -1131,6 +1166,33 @@ WHERE
                       lineageId="Package\Carga de la FACT\Origen FACT.Outputs[OLE DB Source Output].Columns[FECHA_COMIENZO]"
                       name="FECHA_COMIENZO"
                       truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Carga de la FACT\Origen FACT.Outputs[OLE DB Source Output].Columns[Cantidad_Personas]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Carga de la FACT\Origen FACT.Outputs[OLE DB Source Output].ExternalColumns[Cantidad_Personas]"
+                      lineageId="Package\Carga de la FACT\Origen FACT.Outputs[OLE DB Source Output].Columns[Cantidad_Personas]"
+                      name="Cantidad_Personas"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Carga de la FACT\Origen FACT.Outputs[OLE DB Source Output].Columns[Suma_Monto]"
+                      dataType="cy"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Carga de la FACT\Origen FACT.Outputs[OLE DB Source Output].ExternalColumns[Suma_Monto]"
+                      lineageId="Package\Carga de la FACT\Origen FACT.Outputs[OLE DB Source Output].Columns[Suma_Monto]"
+                      name="Suma_Monto"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Carga de la FACT\Origen FACT.Outputs[OLE DB Source Output].Columns[Promedio_Edad]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Carga de la FACT\Origen FACT.Outputs[OLE DB Source Output].ExternalColumns[Promedio_Edad]"
+                      lineageId="Package\Carga de la FACT\Origen FACT.Outputs[OLE DB Source Output].Columns[Promedio_Edad]"
+                      name="Promedio_Edad"
+                      truncationRowDisposition="FailComponent" />
                   </outputColumns>
                   <externalMetadataColumns
                     isUsed="True">
@@ -1158,6 +1220,18 @@ WHERE
                       refId="Package\Carga de la FACT\Origen FACT.Outputs[OLE DB Source Output].ExternalColumns[FECHA_COMIENZO]"
                       dataType="dbDate"
                       name="FECHA_COMIENZO" />
+                    <externalMetadataColumn
+                      refId="Package\Carga de la FACT\Origen FACT.Outputs[OLE DB Source Output].ExternalColumns[Cantidad_Personas]"
+                      dataType="i4"
+                      name="Cantidad_Personas" />
+                    <externalMetadataColumn
+                      refId="Package\Carga de la FACT\Origen FACT.Outputs[OLE DB Source Output].ExternalColumns[Suma_Monto]"
+                      dataType="cy"
+                      name="Suma_Monto" />
+                    <externalMetadataColumn
+                      refId="Package\Carga de la FACT\Origen FACT.Outputs[OLE DB Source Output].ExternalColumns[Promedio_Edad]"
+                      dataType="i4"
+                      name="Promedio_Edad" />
                   </externalMetadataColumns>
                 </output>
                 <output
@@ -1195,6 +1269,21 @@ WHERE
                       dataType="dbDate"
                       lineageId="Package\Carga de la FACT\Origen FACT.Outputs[OLE DB Source Error Output].Columns[FECHA_COMIENZO]"
                       name="FECHA_COMIENZO" />
+                    <outputColumn
+                      refId="Package\Carga de la FACT\Origen FACT.Outputs[OLE DB Source Error Output].Columns[Cantidad_Personas]"
+                      dataType="i4"
+                      lineageId="Package\Carga de la FACT\Origen FACT.Outputs[OLE DB Source Error Output].Columns[Cantidad_Personas]"
+                      name="Cantidad_Personas" />
+                    <outputColumn
+                      refId="Package\Carga de la FACT\Origen FACT.Outputs[OLE DB Source Error Output].Columns[Suma_Monto]"
+                      dataType="cy"
+                      lineageId="Package\Carga de la FACT\Origen FACT.Outputs[OLE DB Source Error Output].Columns[Suma_Monto]"
+                      name="Suma_Monto" />
+                    <outputColumn
+                      refId="Package\Carga de la FACT\Origen FACT.Outputs[OLE DB Source Error Output].Columns[Promedio_Edad]"
+                      dataType="i4"
+                      lineageId="Package\Carga de la FACT\Origen FACT.Outputs[OLE DB Source Error Output].Columns[Promedio_Edad]"
+                      name="Promedio_Edad" />
                     <outputColumn
                       refId="Package\Carga de la FACT\Origen FACT.Outputs[OLE DB Source Error Output].Columns[ErrorCode]"
                       dataType="i4"
@@ -3225,6 +3314,10 @@ GROUP BY	FECHA_COMIENZO</property>
           Id="Package\Carga de Facultad"
           TopLeft="196,149" />
         <NodeLayout
+          Size="160,42"
+          Id="Package\Carga de la FACT"
+          TopLeft="627,570" />
+        <NodeLayout
           Size="168,42"
           Id="Package\Carga de Localidad"
           TopLeft="275,215" />
@@ -3233,6 +3326,10 @@ GROUP BY	FECHA_COMIENZO</property>
           Id="Package\Carga Fecha de nacimiento"
           TopLeft="481,425" />
         <NodeLayout
+          Size="223,42"
+          Id="Package\Carga Persona (no duplicadas)"
+          TopLeft="542,498" />
+        <NodeLayout
           Size="146,42"
           Id="Package\Carga Salarios"
           TopLeft="331,280" />
@@ -3240,6 +3337,10 @@ GROUP BY	FECHA_COMIENZO</property>
           Size="145,42"
           Id="Package\Carga Tiempo"
           TopLeft="404,348" />
+        <NodeLayout
+          Size="188,42"
+          Id="Package\Eliminación de la DATA"
+          TopLeft="22,2" />
         <EdgeLayout
           Id="Package.PrecedenceConstraints[Constraint]"
           TopLeft="183.5,116">
@@ -3410,48 +3511,6 @@ GROUP BY	FECHA_COMIENZO</property>
             <EdgeLabelCollection />
           </EdgeLayout.Labels>
         </EdgeLayout>
-        <NodeLayout
-          Size="223,42"
-          Id="Package\Carga Persona (no duplicadas)"
-          TopLeft="542,498" />
-        <NodeLayout
-          Size="160,42"
-          Id="Package\Carga de la FACT"
-          TopLeft="627,570" />
-        <EdgeLayout
-          Id="Package.PrecedenceConstraints[Constraint 6]"
-          TopLeft="653.5,540">
-          <EdgeLayout.Curve>
-            <mssgle:Curve
-              StartConnector="{assembly:Null}"
-              EndConnector="53.5,30"
-              Start="0,0"
-              End="53.5,22.5">
-              <mssgle:Curve.Segments>
-                <mssgle:SegmentCollection
-                  Capacity="5">
-                  <mssgle:LineSegment
-                    End="0,11" />
-                  <mssgle:CubicBezierSegment
-                    Point1="0,11"
-                    Point2="0,15"
-                    Point3="4,15" />
-                  <mssgle:LineSegment
-                    End="49.5,15" />
-                  <mssgle:CubicBezierSegment
-                    Point1="49.5,15"
-                    Point2="53.5,15"
-                    Point3="53.5,19" />
-                  <mssgle:LineSegment
-                    End="53.5,22.5" />
-                </mssgle:SegmentCollection>
-              </mssgle:Curve.Segments>
-            </mssgle:Curve>
-          </EdgeLayout.Curve>
-          <EdgeLayout.Labels>
-            <EdgeLabelCollection />
-          </EdgeLayout.Labels>
-        </EdgeLayout>
         <EdgeLayout
           Id="Package.PrecedenceConstraints[Constraint 5]"
           TopLeft="584.5,467">
@@ -3486,10 +3545,40 @@ GROUP BY	FECHA_COMIENZO</property>
             <EdgeLabelCollection />
           </EdgeLayout.Labels>
         </EdgeLayout>
-        <NodeLayout
-          Size="188,42"
-          Id="Package\Eliminación de la DATA"
-          TopLeft="22,2" />
+        <EdgeLayout
+          Id="Package.PrecedenceConstraints[Constraint 6]"
+          TopLeft="653.5,540">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="53.5,30"
+              Start="0,0"
+              End="53.5,22.5">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,11" />
+                  <mssgle:CubicBezierSegment
+                    Point1="0,11"
+                    Point2="0,15"
+                    Point3="4,15" />
+                  <mssgle:LineSegment
+                    End="49.5,15" />
+                  <mssgle:CubicBezierSegment
+                    Point1="49.5,15"
+                    Point2="53.5,15"
+                    Point3="53.5,19" />
+                  <mssgle:LineSegment
+                    End="53.5,22.5" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
         <EdgeLayout
           Id="Package.PrecedenceConstraints[Constraint 7]"
           TopLeft="116,44">
@@ -3710,6 +3799,115 @@ GROUP BY	FECHA_COMIENZO</property>
     </Properties>
   </PipelineComponentMetadata>
   <TaskHost
+    design-time-name="Package\Carga de la FACT">
+    <LayoutInfo>
+      <GraphLayout
+        Capacity="8" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml">
+        <NodeLayout
+          Size="138,42"
+          Id="Package\Carga de la FACT\Origen FACT"
+          TopLeft="404,99" />
+        <NodeLayout
+          Size="159,42"
+          Id="Package\Carga de la FACT\Conversión FACT"
+          TopLeft="449,176" />
+        <NodeLayout
+          Size="142,42"
+          Id="Package\Carga de la FACT\Destino FACT"
+          TopLeft="503,245" />
+        <EdgeLayout
+          Id="Package\Carga de la FACT.Paths[OLE DB Source Output]"
+          TopLeft="473,141">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="55.5,35"
+              Start="0,0"
+              End="55.5,27.5">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,13.5" />
+                  <mssgle:CubicBezierSegment
+                    Point1="0,13.5"
+                    Point2="0,17.5"
+                    Point3="4,17.5" />
+                  <mssgle:LineSegment
+                    End="51.5,17.5" />
+                  <mssgle:CubicBezierSegment
+                    Point1="51.5,17.5"
+                    Point2="55.5,17.5"
+                    Point3="55.5,21.5" />
+                  <mssgle:LineSegment
+                    End="55.5,27.5" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout
+          Id="Package\Carga de la FACT.Paths[Data Conversion Output]"
+          TopLeft="528.5,218">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="45.5,27"
+              Start="0,0"
+              End="45.5,19.5">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,9.5" />
+                  <mssgle:CubicBezierSegment
+                    Point1="0,9.5"
+                    Point2="0,13.5"
+                    Point3="4,13.5" />
+                  <mssgle:LineSegment
+                    End="41.5,13.5" />
+                  <mssgle:CubicBezierSegment
+                    Point1="41.5,13.5"
+                    Point2="45.5,13.5"
+                    Point3="45.5,17.5" />
+                  <mssgle:LineSegment
+                    End="45.5,19.5" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+      </GraphLayout>
+    </LayoutInfo>
+  </TaskHost>
+  <PipelineComponentMetadata
+    design-time-name="Package\Carga de la FACT\Origen FACT">
+    <Properties>
+      <Property>
+        <Name>DataSourceViewID</Name>
+      </Property>
+    </Properties>
+  </PipelineComponentMetadata>
+  <PipelineComponentMetadata
+    design-time-name="Package\Carga de la FACT\Destino FACT">
+    <Properties>
+      <Property>
+        <Name>DataSourceViewID</Name>
+      </Property>
+      <Property>
+        <Name>TableInfoObjectType</Name>
+        <Value
+          type="q2:string">Table</Value>
+      </Property>
+    </Properties>
+  </PipelineComponentMetadata>
+  <TaskHost
     design-time-name="Package\Carga de Localidad">
     <LayoutInfo>
       <GraphLayout
@@ -3895,6 +4093,19 @@ GROUP BY	FECHA_COMIENZO</property>
     </LayoutInfo>
   </TaskHost>
   <PipelineComponentMetadata
+    design-time-name="Package\Carga Fecha de nacimiento\Destino Fecha Nacimiento">
+    <Properties>
+      <Property>
+        <Name>DataSourceViewID</Name>
+      </Property>
+      <Property>
+        <Name>TableInfoObjectType</Name>
+        <Value
+          type="q2:string">Table</Value>
+      </Property>
+    </Properties>
+  </PipelineComponentMetadata>
+  <PipelineComponentMetadata
     design-time-name="Package\Carga Fecha de nacimiento\Origen Fecha Nacimiento">
     <Properties>
       <Property>
@@ -3902,8 +4113,104 @@ GROUP BY	FECHA_COMIENZO</property>
       </Property>
     </Properties>
   </PipelineComponentMetadata>
+  <TaskHost
+    design-time-name="Package\Carga Persona (no duplicadas)">
+    <LayoutInfo>
+      <GraphLayout
+        Capacity="8" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml">
+        <NodeLayout
+          Size="151,42"
+          Id="Package\Carga Persona (no duplicadas)\Origen Persona"
+          TopLeft="247,64" />
+        <NodeLayout
+          Size="172,42"
+          Id="Package\Carga Persona (no duplicadas)\Conversión Persona"
+          TopLeft="272,136" />
+        <EdgeLayout
+          Id="Package\Carga Persona (no duplicadas).Paths[OLE DB Source Output]"
+          TopLeft="322.5,106">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="35.5,30"
+              Start="0,0"
+              End="35.5,22.5">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,11" />
+                  <mssgle:CubicBezierSegment
+                    Point1="0,11"
+                    Point2="0,15"
+                    Point3="4,15" />
+                  <mssgle:LineSegment
+                    End="31.5,15" />
+                  <mssgle:CubicBezierSegment
+                    Point1="31.5,15"
+                    Point2="35.5,15"
+                    Point3="35.5,19" />
+                  <mssgle:LineSegment
+                    End="35.5,22.5" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <NodeLayout
+          Size="155,42"
+          Id="Package\Carga Persona (no duplicadas)\Destino Persona"
+          TopLeft="341,223" />
+        <EdgeLayout
+          Id="Package\Carga Persona (no duplicadas).Paths[Data Conversion Output]"
+          TopLeft="358,178">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="60.5,45"
+              Start="0,0"
+              End="60.5,37.5">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,18.5" />
+                  <mssgle:CubicBezierSegment
+                    Point1="0,18.5"
+                    Point2="0,22.5"
+                    Point3="4,22.5" />
+                  <mssgle:LineSegment
+                    End="56.5,22.5" />
+                  <mssgle:CubicBezierSegment
+                    Point1="56.5,22.5"
+                    Point2="60.5,22.5"
+                    Point3="60.5,26.5" />
+                  <mssgle:LineSegment
+                    End="60.5,37.5" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+      </GraphLayout>
+    </LayoutInfo>
+  </TaskHost>
   <PipelineComponentMetadata
-    design-time-name="Package\Carga Fecha de nacimiento\Destino Fecha Nacimiento">
+    design-time-name="Package\Carga Persona (no duplicadas)\Origen Persona">
+    <Properties>
+      <Property>
+        <Name>DataSourceViewID</Name>
+      </Property>
+    </Properties>
+  </PipelineComponentMetadata>
+  <PipelineComponentMetadata
+    design-time-name="Package\Carga Persona (no duplicadas)\Destino Persona">
     <Properties>
       <Property>
         <Name>DataSourceViewID</Name>
@@ -4102,224 +4409,6 @@ GROUP BY	FECHA_COMIENZO</property>
   </PipelineComponentMetadata>
   <PipelineComponentMetadata
     design-time-name="Package\Carga Tiempo\Destino Tiempo">
-    <Properties>
-      <Property>
-        <Name>DataSourceViewID</Name>
-      </Property>
-      <Property>
-        <Name>TableInfoObjectType</Name>
-        <Value
-          type="q2:string">Table</Value>
-      </Property>
-    </Properties>
-  </PipelineComponentMetadata>
-  <TaskHost
-    design-time-name="Package\Carga Persona (no duplicadas)">
-    <LayoutInfo>
-      <GraphLayout
-        Capacity="8" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml">
-        <NodeLayout
-          Size="151,42"
-          Id="Package\Carga Persona (no duplicadas)\Origen Persona"
-          TopLeft="247,64" />
-        <NodeLayout
-          Size="172,42"
-          Id="Package\Carga Persona (no duplicadas)\Conversión Persona"
-          TopLeft="272,136" />
-        <EdgeLayout
-          Id="Package\Carga Persona (no duplicadas).Paths[OLE DB Source Output]"
-          TopLeft="322.5,106">
-          <EdgeLayout.Curve>
-            <mssgle:Curve
-              StartConnector="{assembly:Null}"
-              EndConnector="35.5,30"
-              Start="0,0"
-              End="35.5,22.5">
-              <mssgle:Curve.Segments>
-                <mssgle:SegmentCollection
-                  Capacity="5">
-                  <mssgle:LineSegment
-                    End="0,11" />
-                  <mssgle:CubicBezierSegment
-                    Point1="0,11"
-                    Point2="0,15"
-                    Point3="4,15" />
-                  <mssgle:LineSegment
-                    End="31.5,15" />
-                  <mssgle:CubicBezierSegment
-                    Point1="31.5,15"
-                    Point2="35.5,15"
-                    Point3="35.5,19" />
-                  <mssgle:LineSegment
-                    End="35.5,22.5" />
-                </mssgle:SegmentCollection>
-              </mssgle:Curve.Segments>
-            </mssgle:Curve>
-          </EdgeLayout.Curve>
-          <EdgeLayout.Labels>
-            <EdgeLabelCollection />
-          </EdgeLayout.Labels>
-        </EdgeLayout>
-        <NodeLayout
-          Size="155,42"
-          Id="Package\Carga Persona (no duplicadas)\Destino Persona"
-          TopLeft="341,223" />
-        <EdgeLayout
-          Id="Package\Carga Persona (no duplicadas).Paths[Data Conversion Output]"
-          TopLeft="358,178">
-          <EdgeLayout.Curve>
-            <mssgle:Curve
-              StartConnector="{assembly:Null}"
-              EndConnector="60.5,45"
-              Start="0,0"
-              End="60.5,37.5">
-              <mssgle:Curve.Segments>
-                <mssgle:SegmentCollection
-                  Capacity="5">
-                  <mssgle:LineSegment
-                    End="0,18.5" />
-                  <mssgle:CubicBezierSegment
-                    Point1="0,18.5"
-                    Point2="0,22.5"
-                    Point3="4,22.5" />
-                  <mssgle:LineSegment
-                    End="56.5,22.5" />
-                  <mssgle:CubicBezierSegment
-                    Point1="56.5,22.5"
-                    Point2="60.5,22.5"
-                    Point3="60.5,26.5" />
-                  <mssgle:LineSegment
-                    End="60.5,37.5" />
-                </mssgle:SegmentCollection>
-              </mssgle:Curve.Segments>
-            </mssgle:Curve>
-          </EdgeLayout.Curve>
-          <EdgeLayout.Labels>
-            <EdgeLabelCollection />
-          </EdgeLayout.Labels>
-        </EdgeLayout>
-      </GraphLayout>
-    </LayoutInfo>
-  </TaskHost>
-  <PipelineComponentMetadata
-    design-time-name="Package\Carga Persona (no duplicadas)\Origen Persona">
-    <Properties>
-      <Property>
-        <Name>DataSourceViewID</Name>
-      </Property>
-    </Properties>
-  </PipelineComponentMetadata>
-  <PipelineComponentMetadata
-    design-time-name="Package\Carga Persona (no duplicadas)\Destino Persona">
-    <Properties>
-      <Property>
-        <Name>DataSourceViewID</Name>
-      </Property>
-      <Property>
-        <Name>TableInfoObjectType</Name>
-        <Value
-          type="q2:string">Table</Value>
-      </Property>
-    </Properties>
-  </PipelineComponentMetadata>
-  <TaskHost
-    design-time-name="Package\Carga de la FACT">
-    <LayoutInfo>
-      <GraphLayout
-        Capacity="8" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml">
-        <NodeLayout
-          Size="138,42"
-          Id="Package\Carga de la FACT\Origen FACT"
-          TopLeft="404,99" />
-        <NodeLayout
-          Size="142,42"
-          Id="Package\Carga de la FACT\Destino FACT"
-          TopLeft="503,245" />
-        <NodeLayout
-          Size="159,42"
-          Id="Package\Carga de la FACT\Conversión FACT"
-          TopLeft="449,176" />
-        <EdgeLayout
-          Id="Package\Carga de la FACT.Paths[OLE DB Source Output]"
-          TopLeft="473,141">
-          <EdgeLayout.Curve>
-            <mssgle:Curve
-              StartConnector="{assembly:Null}"
-              EndConnector="55.5,35"
-              Start="0,0"
-              End="55.5,27.5">
-              <mssgle:Curve.Segments>
-                <mssgle:SegmentCollection
-                  Capacity="5">
-                  <mssgle:LineSegment
-                    End="0,13.5" />
-                  <mssgle:CubicBezierSegment
-                    Point1="0,13.5"
-                    Point2="0,17.5"
-                    Point3="4,17.5" />
-                  <mssgle:LineSegment
-                    End="51.5,17.5" />
-                  <mssgle:CubicBezierSegment
-                    Point1="51.5,17.5"
-                    Point2="55.5,17.5"
-                    Point3="55.5,21.5" />
-                  <mssgle:LineSegment
-                    End="55.5,27.5" />
-                </mssgle:SegmentCollection>
-              </mssgle:Curve.Segments>
-            </mssgle:Curve>
-          </EdgeLayout.Curve>
-          <EdgeLayout.Labels>
-            <EdgeLabelCollection />
-          </EdgeLayout.Labels>
-        </EdgeLayout>
-        <EdgeLayout
-          Id="Package\Carga de la FACT.Paths[Data Conversion Output]"
-          TopLeft="528.5,218">
-          <EdgeLayout.Curve>
-            <mssgle:Curve
-              StartConnector="{assembly:Null}"
-              EndConnector="45.5,27"
-              Start="0,0"
-              End="45.5,19.5">
-              <mssgle:Curve.Segments>
-                <mssgle:SegmentCollection
-                  Capacity="5">
-                  <mssgle:LineSegment
-                    End="0,9.5" />
-                  <mssgle:CubicBezierSegment
-                    Point1="0,9.5"
-                    Point2="0,13.5"
-                    Point3="4,13.5" />
-                  <mssgle:LineSegment
-                    End="41.5,13.5" />
-                  <mssgle:CubicBezierSegment
-                    Point1="41.5,13.5"
-                    Point2="45.5,13.5"
-                    Point3="45.5,17.5" />
-                  <mssgle:LineSegment
-                    End="45.5,19.5" />
-                </mssgle:SegmentCollection>
-              </mssgle:Curve.Segments>
-            </mssgle:Curve>
-          </EdgeLayout.Curve>
-          <EdgeLayout.Labels>
-            <EdgeLabelCollection />
-          </EdgeLayout.Labels>
-        </EdgeLayout>
-      </GraphLayout>
-    </LayoutInfo>
-  </TaskHost>
-  <PipelineComponentMetadata
-    design-time-name="Package\Carga de la FACT\Origen FACT">
-    <Properties>
-      <Property>
-        <Name>DataSourceViewID</Name>
-      </Property>
-    </Properties>
-  </PipelineComponentMetadata>
-  <PipelineComponentMetadata
-    design-time-name="Package\Carga de la FACT\Destino FACT">
     <Properties>
       <Property>
         <Name>DataSourceViewID</Name>
